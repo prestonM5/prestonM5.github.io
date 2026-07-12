@@ -344,7 +344,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             onClick={onClose}
             className="font-mono text-xs text-ink-400 transition-colors hover:text-ink-900"
           >
-            [esc] close
+            [esc] close 
           </button>
         </div>
         <div className="aspect-[16/9] border-b hairline bg-white">
