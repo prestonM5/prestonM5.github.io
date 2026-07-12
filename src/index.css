@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ink-50 text-ink-800 font-sans antialiased;
+  }
+  ::selection {
+    @apply bg-ink-800 text-ink-50;
+  }
+}
+
+@layer components {
+  .label {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-400;
+  }
+  .section-num {
+    @apply font-mono text-xs text-ink-300 tabular-nums;
+  }
+  .hairline {
+    @apply border-ink-200;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Draw-on-load stroke animation for figure SVGs */
+.draw-path {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: var(--len, 1200);
+  animation: dash 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+@keyframes dash {
+  to { stroke-dashoffset: 0; }
+}

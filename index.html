@@ -1,114 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Preston Moore</title>
-  <style>
-    body {
-      max-width: 680px;
-      margin: 60px auto;
-      padding: 0 20px;
-      font-family: Georgia, serif;
-      line-height: 1.6;
-    }
-    h1 { margin-bottom: 4px; }
-    h2 { margin-top: 40px; margin-bottom: 8px; border-bottom: 1px solid #000; padding-bottom: 4px; }
-    h3 { margin-bottom: 4px; }
-    p { margin: 6px 0; }
-    ul { margin: 6px 0; padding-left: 20px; }
-    li { margin-bottom: 4px; }
-    a { color: inherit; }
-    .meta { color: #555; font-size: 0.9em; margin-bottom: 2px; }
-    .project { margin-bottom: 32px; }
-    .contact { margin-top: 6px; }
-  </style>
-</head>
-<body>
-
-  <h1>Preston Moore</h1>
-  <p class="contact">
-    <a href="mailto:pmoore54@charlotte.edu">pmoore54@charlotte.edu</a> &nbsp;·&nbsp;
-    <a href="mailto:pmoore1637@gmail.com">pmoore1637@gmail.com</a> &nbsp;·&nbsp;
-    (336) 549-8832 &nbsp;·&nbsp;
-    Charlotte, NC &nbsp;·&nbsp;
-    <a href="https://github.com/prestonM5" target="_blank">GitHub</a> &nbsp;·&nbsp;
-    <a href="https://www.linkedin.com/in/preston-moore-593870388/" target="_blank">LinkedIn</a>
-  </p>
-  <p>
-    Junior pursuing a B.S. in Computer Science with a strong interest in Deep Learning, Finance, and Software Development. 
-    Seeking opportunities to grow technical expertise while delivering value on impactful projects.
-  </p>
-
-  <h2>Education</h2>
-
-  <p><strong>University of North Carolina at Charlotte</strong> — B.S., Computer Science &amp; Minor in Mathematics</p>
-  <p class="meta">2025 – 2027</p>
-
-  <p style="margin-top: 14px;"><strong>Guilford Technical Community College</strong> — A.S., Computer Science</p>
-  <p class="meta">2023 – 2025 &nbsp;·&nbsp; GPA: 3.67 &nbsp;·&nbsp; Dean's List: Spring 2024, Summer 2024, Spring 2025 &nbsp;·&nbsp; Honors List: Fall 2023</p>
-
-  <h2>Skills</h2>
-  <p>Python, Java, JavaScript, TypeScript, React, Tailwind CSS, Node.js, Express, MongoDB, PyTorch, Jupyter Notebook, CUDA</p>
-
-  <h2>Projects</h2>
-
-  <div class="project">
-    <h3>Trading Suite &nbsp;<span style="font-weight:normal;font-size:0.9em;">— <a href="https://suitetrading.vercel.app" target="_blank">suitetrading.vercel.app</a></span></h3>
-    <p class="meta">React 19 · TypeScript · Express 5 · MongoDB · Finnhub API · Yahoo Finance</p>
-    <p>
-      A full-stack stock market analytics and portfolio dashboard — a faster, more intuitive alternative to traditional trading terminals.
-      Users sign in with Google, build a custom dashboard from resizable widgets (charts, quotes, news, sector heatmap, watchlist, portfolio tracker),
-      and track real holdings against live market data.
-    </p>
-    <ul>
-      <li>Designed and built a full-stack (React + TypeScript + Express + MongoDB) trading dashboard with Google OAuth, encrypted per-user API key storage, and six independent real-time data widgets.</li>
-      <li>Built a custom binary-split-tree layout engine from scratch (no grid library) supporting proportional resizing, minimum-size constraints, and persistent drag-to-resize dashboards.</li>
-      <li>Implemented secure server-side handling of third-party API keys using AES-256-GCM encryption — user-supplied Finnhub keys are never exposed to the client after submission.</li>
-      <li>Designed a two-layer rate-limiting system (per-IP throttling + atomic per-user daily quota in MongoDB) to safely proxy a metered third-party market-data API.</li>
-      <li>Built a client-side data layer with in-flight request deduplication and TTL caching to minimize redundant API calls when multiple widgets request overlapping market data.</li>
-      <li>Integrated two market-data providers (Finnhub for real-time quotes/news/fundamentals, Yahoo Finance for historical OHLCV candles) behind a unified backend API.</li>
-    </ul>
-  </div>
-
-  <div class="project">
-    <h3>Sentence Generation with a Word-Level Vanilla RNN</h3>
-    <p class="meta">PyTorch · Python</p>
-    <ul>
-      <li>Designed and implemented a word-level vanilla RNN in PyTorch for sentence generation, extending prior work on character-level name prediction.</li>
-      <li>Built a custom tokenizer and vocabulary from scratch to preprocess the Salesforce WikiText-103 dataset, enabling word-to-index and index-to-word encoding/decoding.</li>
-      <li>Developed a PyTorch-compatible dataset pipeline with sliding windows and a custom collate function for batching and padding sequences.</li>
-      <li>Implemented a training loop with loss computation, backpropagation, gradient clipping, and perplexity evaluation; created a generation function supporting temperature scaling and top-k sampling.</li>
-      <li>Analyzed overfitting challenges inherent to vanilla RNNs, demonstrating awareness of model limitations and optimization strategies.</li>
-    </ul>
-  </div>
-
-  <div class="project">
-    <h3>Full-Stack Paper Trading Website</h3>
-    <p class="meta">React · MongoDB · Tailwind · Mailtrap · JWT</p>
-    <ul>
-      <li>Built a full-stack paper trading platform with real-time intraday stock data, user authentication (login, register, email verification, password reset via Mailtrap/JWT), and portfolio tracking.</li>
-      <li>Frontend: stock search, informational dashboard, and portfolio view with pie chart breakdown of holdings.</li>
-      <li>Backend: REST API routes for buying/selling, MongoDB for user accounts and positions, JWT session management.</li>
-    </ul>
-  </div>
-
-  <div class="project">
-    <h3>Simple Neural Network for Classifying Pattern-Based Vectors</h3>
-    <p class="meta">PyTorch · CUDA · Matplotlib · Jupyter Notebook</p>
-    <ul>
-      <li>Implemented a neural network from scratch to demonstrate core ideas of pattern recognition and gradient-based learning.</li>
-      <li>Experimented with batching, optimizer/loss function selection, epoch count, and hidden layer depth; plotted training loss to visualize model convergence.</li>
-      <li>Concluded that improved architectures and higher-quality data are essential for accurate predictions on complex tasks.</li>
-    </ul>
-  </div>
-
-  <div class="project">
-    <h3>Generative AI and Synthetic Media — Technical History Presentation</h3>
-    <ul>
-      <li>Researched and presented the full technical history of generative AI and synthetic media to a broad audience, covering neural network origins, backpropagation, CNNs, RNNs, transformers, and the Dartmouth Conference.</li>
-    </ul>
-  </div>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <title>Preston Moore — Computer Science</title>
+    <meta name="description" content="Preston Moore — B.S. Computer Science student at UNC Charlotte. Projects in full-stack development, deep learning, and finance." />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
