@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { projects, type Project } from './data';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { projects, type CaseStudyBlock, type Project } from './data';
 import Figure from './Figure';
 
 export default function App() {
@@ -246,7 +246,7 @@ function ProjectCard({
     <button
       ref={ref}
       onClick={() => onOpen(project)}
-      className="group text-left animate-fade-up"
+      className="group self-start text-left animate-fade-up"
       style={{ animationDelay: `${index * 0.06}s` }}
     >
       <div className="flex items-baseline justify-between">
@@ -329,13 +329,17 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
     };
   }, [onClose]);
 
+  const hasCaseStudy = !!project.caseStudy?.length;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-900/40 p-4 backdrop-blur-sm sm:p-8"
       onClick={onClose}
     >
       <div
-        className="mt-8 w-full max-w-2xl animate-fade-up rounded-lg border hairline bg-ink-50 shadow-2xl"
+        className={`mt-8 w-full animate-fade-up rounded-lg border hairline bg-ink-50 shadow-2xl ${
+          hasCaseStudy ? 'max-w-3xl' : 'max-w-2xl'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b hairline px-6 py-4">
@@ -374,6 +378,13 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             <p className="label mb-2">Abstract</p>
             <p className="text-[15px] leading-relaxed text-ink-600">{project.abstract}</p>
           </div>
+          {hasCaseStudy && (
+            <div className="mt-2">
+              {project.caseStudy!.map((block, i) => (
+                <CaseStudy key={i} block={block} />
+              ))}
+            </div>
+          )}
           {project.link && (
             <a
               href={project.link}
@@ -388,4 +399,54 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       </div>
     </div>
   );
+}
+
+/* Inline **bold** parser — the only markdown the case-study copy uses */
+function withInlineBold(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={i} className="font-medium text-ink-800">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    ),
+  );
+}
+
+function CaseStudy({ block }: { block: CaseStudyBlock }) {
+  switch (block.kind) {
+    case 'heading':
+      return (
+        <h4 className="mt-8 font-serif text-lg tracking-tightish text-ink-900">{block.text}</h4>
+      );
+    case 'p':
+      return (
+        <p className="mt-3 text-[15px] leading-relaxed text-ink-600">
+          {withInlineBold(block.text)}
+        </p>
+      );
+    case 'list':
+      return (
+        <ul className="mt-3 list-outside list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed text-ink-600">
+          {block.items.map((item, i) => (
+            <li key={i}>{withInlineBold(item)}</li>
+          ))}
+        </ul>
+      );
+    case 'figure':
+      return (
+        <div className={`mt-4 grid gap-4 ${block.images.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+          {block.images.map((img) => (
+            <figure key={img.src}>
+              <div className="overflow-hidden rounded-sm border hairline bg-white">
+                <img src={img.src} alt={img.caption} className="h-auto w-full object-contain" />
+              </div>
+              <figcaption className="mt-1.5 text-xs italic text-ink-500">{img.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      );
+  }
 }
