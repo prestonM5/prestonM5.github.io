@@ -182,8 +182,8 @@ function Stat({ k, label }: { k: string; label: string }) {
 /* Education */
 function Education() {
   const skills = [
-    'Python', 'Java', 'JavaScript', 'TypeScript', 'React', 'Tailwind CSS',
-    'Node.js', 'Express', 'MongoDB', 'PyTorch', 'Jupyter Notebook', 'CUDA',
+    'Python', 'JavaScript', 'TypeScript', 'React',
+    'Node.js', 'Express', 'MongoDB', 'PyTorch', 'CUDA',
   ];
 
   return (
@@ -226,17 +226,76 @@ function Education() {
 
 /* Projects */
 function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
+  const featured = projects.filter((p) => p.featured);
+  const additional = projects.filter((p) => !p.featured);
+
   return (
     <section id="work" className="border-t hairline px-6 py-24 scroll-mt-14">
       <div className="mx-auto max-w-5xl">
         <SectionHeader num="§ 02" title="Projects" />
         <div className="mt-14 grid grid-cols-1 gap-x-12 gap-y-16 md:grid-cols-2">
-          {projects.map((p, i) => (
+          {featured.map((p, i) => (
             <ProjectCard key={p.id} project={p} index={i} onOpen={onOpen} />
           ))}
         </div>
+        {additional.length > 0 && <AdditionalWork projects={additional} onOpen={onOpen} />}
       </div>
     </section>
+  );
+}
+
+function AdditionalWork({ projects, onOpen }: { projects: Project[]; onOpen: (p: Project) => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mt-16 border-t hairline pt-8">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="group flex items-center gap-2 font-mono text-xs uppercase tracking-wide text-ink-500 transition-colors hover:text-ink-900"
+        aria-expanded={open}
+      >
+        <span
+          className={`inline-block transition-transform duration-300 ${open ? 'rotate-90' : ''}`}
+        >
+          →
+        </span>
+        {open ? 'Hide additional work' : `Show additional work (${projects.length})`}
+      </button>
+      {open && (
+        <div className="mt-8 divide-y hairline border-t hairline">
+          {projects.map((p) => (
+            <AdditionalWorkRow key={p.id} project={p} onOpen={onOpen} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdditionalWorkRow({ project, onOpen }: { project: Project; onOpen: (p: Project) => void }) {
+  return (
+    <button
+      onClick={() => onOpen(project)}
+      className="group flex w-full flex-col items-start gap-1 py-6 text-left sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+    >
+      <div>
+        <div className="flex items-baseline gap-3">
+          <span className="section-num">{project.index}</span>
+          <h3 className="font-serif text-lg leading-snug tracking-tightish text-ink-900 transition-colors group-hover:text-accent-600">
+            {project.title}
+          </h3>
+        </div>
+        <p className="mt-1 text-sm leading-relaxed text-ink-500">{project.subtitle}</p>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+          {project.stack.map((s) => (
+            <span key={s} className="font-mono text-[11px] text-ink-400">
+              {s}
+            </span>
+          ))}
+        </div>
+      </div>
+      <span className="font-mono text-xs text-ink-400 tabular-nums shrink-0">{project.year}</span>
+    </button>
   );
 }
 

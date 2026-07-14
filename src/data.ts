@@ -17,6 +17,9 @@ export type Project = {
   thumbnail?: string;
   thumbnailFit?: 'cover' | 'contain';
   caseStudy?: CaseStudyBlock[];
+  /** Featured projects render with a thumbnail in the main grid; everything
+   * else is tucked under the collapsed "Additional Work" list (no thumbnail). */
+  featured: boolean;
 };
 
 export const projects: Project[] = [
@@ -32,6 +35,7 @@ export const projects: Project[] = [
     figure: 'candle',
     link: 'https://suitetrading.vercel.app',
     thumbnail: '/new_suitetrading_dashboard_2.png',
+    featured: true,
   },
   {
     id: 'gru',
@@ -45,6 +49,7 @@ export const projects: Project[] = [
     figure: 'candle',
     thumbnail: '/embeddings_pca.png',
     thumbnailFit: 'contain',
+    featured: true,
     caseStudy: [
       { kind: 'heading', text: 'Method' },
       {
@@ -146,6 +151,7 @@ export const projects: Project[] = [
     figure: 'graph',
     thumbnail: '/vanilla_rnn.jpg',
     thumbnailFit: 'contain',
+    featured: false,
   },
   {
     id: 'paper-trading',
@@ -157,6 +163,7 @@ export const projects: Project[] = [
     abstract:
       'A full-stack paper trading platform with real-time intraday stock data, user authentication (login, register, email verification, and password reset via Mailtrap and JWT), and portfolio tracking. The frontend covers stock search, an informational dashboard, and a portfolio view with a pie-chart breakdown of holdings; the backend exposes REST routes for buying and selling, backed by MongoDB for accounts and positions.',
     figure: 'stack',
+    featured: false,
   },
   {
     id: 'neural-net',
@@ -168,6 +175,7 @@ export const projects: Project[] = [
     abstract:
       'A neural network implemented from scratch to demonstrate the core ideas of pattern recognition and gradient-based learning. Experiments varied batching, optimizer and loss function choice, epoch count, and hidden layer depth, with training loss plotted to visualize convergence. The results pointed to improved architectures and higher-quality data as the key levers for accuracy on more complex tasks.',
     figure: 'grid',
+    featured: false,
   },
   {
     id: 'genai',
@@ -180,5 +188,6 @@ export const projects: Project[] = [
       'A presentation researching and covering the full technical history of generative AI and synthetic media for a broad audience — from the Dartmouth Conference and the origins of neural networks through backpropagation, CNNs, RNNs, and transformers.',
     figure: 'lattice',
     thumbnail: '/genAI_pp.png',
+    featured: false,
   },
 ];
