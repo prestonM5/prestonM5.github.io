@@ -21,7 +21,7 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: 'p01',
+    id: 'trading-suite',
     index: '01',
     title: 'Trading Suite',
     subtitle: 'A full-stack stock market analytics and portfolio dashboard',
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     thumbnail: '/new_suitetrading_dashboard_2.png',
   },
   {
-    id: 'p02',
+    id: 'gru',
     index: '02',
     title: 'Recurrence Quantification Analysis of a GRU Autoencoder\'s Learned Climate Embedding',
     subtitle: 'A GRU autoencoder\'s climate embedding, tested for genuine seasonal dynamics with joint recurrence plots and surrogate significance testing',
@@ -135,7 +135,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: 'p03',
+    id: 'rnn',
     index: '03',
     title: 'Sentence Generation with a Word-Level Vanilla RNN',
     subtitle: 'A word-level RNN trained on WikiText-103, extending character-level name prediction',
@@ -148,7 +148,7 @@ export const projects: Project[] = [
     thumbnailFit: 'contain',
   },
   {
-    id: 'p04',
+    id: 'paper-trading',
     index: '04',
     title: 'Full-Stack Paper Trading Website',
     subtitle: 'Real-time intraday data, authentication, and portfolio tracking',
@@ -159,7 +159,7 @@ export const projects: Project[] = [
     figure: 'stack',
   },
   {
-    id: 'p05',
+    id: 'neural-net',
     index: '05',
     title: 'Simple Neural Network for Classifying Pattern-Based Vectors',
     subtitle: 'A from-scratch neural network exploring pattern recognition and gradient-based learning',
@@ -170,7 +170,7 @@ export const projects: Project[] = [
     figure: 'grid',
   },
   {
-    id: 'p06',
+    id: 'genai',
     index: '06',
     title: 'Generative AI and Synthetic Media',
     subtitle: 'A technical history presentation, from backpropagation to transformers',

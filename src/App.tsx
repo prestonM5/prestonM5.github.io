@@ -5,16 +5,36 @@ import Figure from './Figure';
 export default function App() {
   const [active, setActive] = useState<Project | null>(null);
 
+  useEffect(() => {
+    const applyHash = () => {
+      const id = window.location.hash.slice(1);
+      setActive(projects.find((p) => p.id === id) ?? null);
+    };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+  }, []);
+
+  const openProject = (p: Project) => {
+    setActive(p);
+    window.location.hash = p.id;
+  };
+
+  const closeProject = () => {
+    setActive(null);
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  };
+
   return (
     <div className="min-h-screen bg-ink-50 text-ink-800">
       <Nav />
       <main>
         <Intro />
         <Education />
-        <Projects onOpen={setActive} />
+        <Projects onOpen={openProject} />
       </main>
       <Footer />
-      {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
+      {active && <ProjectModal project={active} onClose={closeProject} />}
     </div>
   );
 }
