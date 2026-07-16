@@ -129,19 +129,151 @@ export const projects: Project[] = [
       {
         kind: 'p',
         text:
-          'An audit found the Theiler exclusion was one pixel wide instead of 14 days, inflating early numbers. Before fixing it, the window was swept across five sizes (0, 1, 14, 30, 60 days): rankings and rough magnitudes held at every size, only the exact values moved (date 7.81× → 7.26×). Two more bugs (a leap-year phase error in the date encoding, and an unseeded RNG) were fixed the same way, and every result was regenerated and reproduced bit-for-bit.',
+          'An audit found the Theiler exclusion was one pixel wide instead of 14 days, inflating early numbers. Before fixing it, the window was swept across five sizes (0, 1, 14, 30, 60 days): rankings and rough magnitudes held at every size, only the exact values moved (date 7.81× → 7.25×). Two more bugs (a leap-year phase error in the date encoding, and an unseeded RNG) were fixed the same way, and every result was regenerated and reproduced bit-for-bit.',
       },
       { kind: 'heading', text: 'Summary' },
       {
         kind: 'p',
         text:
-          "Recurrence plots, joint recurrence, and a Takens-motivated ablation show the embedding learned the seasonal cycle. Surrogate testing and Bonferroni correction make that claim defensible, and overturn the naive reading: humidity and wind speed hold up statistically where date and pressure, despite looking stronger, don't.",
+          "Recurrence plots, joint recurrence, and a Takens-motivated ablation show the embedding learned the seasonal cycle. Surrogate testing and Bonferroni correction make that claim defensible, and overturn the naive reading: humidity, wind speed, and date hold up statistically where pressure and temperature, despite looking stronger, don't.",
+      },
+    ],
+  },
+  {
+    id: 'koopman-pendulum',
+    index: '03',
+    title: 'Koopman Structure in a Reconstruction-Trained Embedding',
+    subtitle: 'A post-hoc Dynamic Mode Decomposition analysis of whether a video autoencoder secretly learns pendulum physics',
+    year: '2026',
+    stack: ['PyTorch', 'pydmd', 'NumPy', 'SciPy', 'Matplotlib'],
+    abstract:
+      "A convolutional autoencoder is trained, five times independently, to compress 64×64 video frames of a simulated pendulum into an 8-number latent code and reconstruct them, never told about gravity, velocity, or time. Dynamic Mode Decomposition then asks whether that latent trajectory is secretly linear (Koopman-predictable) once a handful of consecutive frames are stacked together. Result: real, shuffle-test-significant structure appears in every seed at the physics-predicted minimum delay, but only 1 of 5 recovers the true oscillation frequency there, a mismatch that a bit more delay resolves for all 5, unless the pendulum's swing is pushed into a genuinely nonlinear regime, where it isn't.",
+    figure: 'wave',
+    thumbnail: '/ksiarte/x1_freq_vs_delay.png',
+    thumbnailFit: 'contain',
+    featured: true,
+    caseStudy: [
+      { kind: 'heading', text: 'Method' },
+      {
+        kind: 'p',
+        text:
+          "A convolutional autoencoder (five independently-trained seeds) compresses each 64×64 frame of a rendered, physically-simulated pendulum down to an 8-number latent code and reconstructs the frame from it, graded only on pixel-level reconstruction quality. It is never given gravity, velocity, or a timestamp. Dynamic Mode Decomposition (DMD) is then run on the resulting latent trajectories to ask a separate question: once translated into the network's own internal numbers, does the pendulum's motion become **linearly predictable**, one frame's code mapping to the next by a single fixed matrix? This is the Koopman-operator idea: some nonlinear systems admit a change of coordinates under which their dynamics turn linear, and the question is whether a network trained purely on pixels stumbles onto such coordinates by accident. The DMD implementation was first validated against a published fluid-dynamics benchmark (cylinder-wake flow, Re=100) to ≥6 significant figures before being trusted on the pendulum.",
+      },
+      {
+        kind: 'p',
+        text:
+          "A single frame can't tell a pendulum swinging left from one swinging right (both look identical mid-arc), so DMD is run not on individual latent codes but on short stacks of **q** consecutive codes (a delay embedding), letting the trajectory implicitly recover velocity the way two consecutive photos can. How large q needs to be before the trajectory becomes DMD-predictable, and separately, before DMD recovers the *correct* frequency, turns out to be the project's central question.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/f2_latent_trajectory_phase.png', caption: 'Latent trajectories retrace a phase-ordered arc, not a loop (top-2 PCs, all 5 seeds)' },
+        ],
+      },
+      { kind: 'heading', text: 'Results' },
+      {
+        kind: 'p',
+        text:
+          "All 5 seeds first cleared the one-step predictability threshold (VAF ≥ 0.90) at **q\\*=2**, the minimum consistent with Takens' theorem for a single scalar observation of a 2-D state (position and velocity), and saturated to VAF ≈ 1.0000 by q=3.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/f5_vaf_vs_delay.png', caption: 'Latent VAF vs. delay count, against the pixel-DMD baseline' },
+        ],
+      },
+      {
+        kind: 'p',
+        text:
+          "Predictability alone isn't proof: a slow, smooth video can look predictable purely because consecutive frames resemble each other, with no real structure behind it. Each latent trajectory was tested against 200 randomly shuffled versions of itself. Every seed's observed VAF sat at the extreme edge of its own null distribution (raw p = 1/201, Holm-Bonferroni corrected p = 0.0249 for all 5): the temporal structure is real, not an artifact of slowness.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/f4_surrogate_null_vaf.png', caption: 'Observed VAF sits far outside the surrogate null (5 seeds, q*=2)' },
+          { src: '/ksiarte/f3_eigenvalue_significance.png', caption: "Observed eigenvalues sit near the unit circle, far from the surrogate null: only 2/5 seeds land on f0's target angle" },
+        ],
+      },
+      {
+        kind: 'p',
+        text:
+          "By the project's pre-registered test (exact_dmd), **only 1 of 5 seeds** recovered the pendulum's true oscillation frequency (f₀ = 0.498488 Hz, from the exact pendulum equations) within the pre-committed 1% tolerance at q\\*=2; the other four locked onto real, statistically significant structure oscillating at the wrong speed, most often exactly the first harmonic, 2×f₀. A second, independent frequency estimator (BOP-DMD, plotted below) agrees on which seeds are harmonic-dominated, but resolves the fundamental more precisely: seed 1 lands at 0.06% off f₀ under BOP-DMD versus 2.57% off (just outside tolerance) under exact_dmd, a known precision bias in plain DMD that BOP-DMD exists to correct. That precision difference, not a contradiction, is why the figure below reads 2 of 5.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/f6_frequency_forest.png', caption: 'BOP-DMD frequency matches f0 for 2/5 seeds; rest land on the 1st harmonic' },
+        ],
+      },
+      { kind: 'heading', text: 'Extension: a little more delay fixes it' },
+      {
+        kind: 'p',
+        text:
+          "Giving each network more delay (no retraining, same weights) resolved the mismatch. By q=5, all 5 seeds' recovered frequency fell inside the tolerance band; by q=8, all 5 converged to within 0.06% of f₀ and stayed there through q=21.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/x1_freq_vs_delay.png', caption: 'All 5 seeds converge to f0 by q=8, unlike at the minimal q*=2' },
+        ],
+      },
+      {
+        kind: 'p',
+        text:
+          "Re-running the complete test (shuffle test, Holm-Bonferroni correction, and an independent uncertainty-quantification method, BOP-DMD) at q=8 confirmed it formally: all 5 seeds now land in the fully-expected outcome, real structure *and* the correct physical speed, not just 1 of 5.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/x2_frequency_forest_q8.png', caption: 'Extension 2 (q=8): BOP-DMD frequency matches f0 for 5/5 seeds' },
+        ],
+      },
+      { kind: 'heading', text: 'Extension: does network size matter?' },
+      {
+        kind: 'p',
+        text:
+          "The same pattern held across a 16× range of latent capacity (d = 2 to d = 32, five fresh seeds trained at each size). The minimum delay for one-step predictability (q\\*=2) never moved, evidence it's set by the pendulum's physics, not the network's size. The delay needed to resolve the *correct* frequency did vary: 24 of 25 (d, seed) combinations converged by q=8, with one exception (d=4) needing q=13, and that exception fully confirmed once given the delay it actually needed.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/x3_freq_vs_delay_by_d.png', caption: 'Frequency convergence across latent dimension d = [2, 4, 8, 16, 32]: 24/25 (d, seed) pairs within tolerance by q=8' },
+        ],
+      },
+      { kind: 'heading', text: 'Extension: pushing into the nonlinear regime' },
+      {
+        kind: 'p',
+        text:
+          "Every result above used a small, ~5.7° swing, where a pendulum behaves almost like a linear spring. Repeating everything at a much wider, genuinely nonlinear 28.6° swing broke the pattern for good: no seed, at any tested delay, ever recovered the true frequency. Every network's dominant oscillation locked onto a harmonic (2× or 3× f₀) and stayed there through q=21.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/x5_freq_vs_delay_large_amplitude.png', caption: 'Extension 5 (theta0=0.5): recovered frequency stays on a harmonic, never the true f0' },
+        ],
+      },
+      {
+        kind: 'p',
+        text:
+          "A supplementary check ruled out the renderer as the cause: DMD run directly on the exact, uncompressed pixel trajectory (no autoencoder involved) recovers the true frequency to near machine precision. Whatever locks the network onto the wrong harmonic happens inside the trained latent space itself, not upstream of it. Escalating this negative result to the full shuffle test confirmed it's real, not noise: the wrong-speed structure is exactly as statistically significant as every correct-speed result elsewhere in the project.",
+      },
+      {
+        kind: 'figure',
+        images: [
+          { src: '/ksiarte/x7_frequency_forest_large_amp_q13.png', caption: 'Extension 7 (q=13): BOP-DMD frequency matches exact f0 for 0/5 seeds' },
+        ],
+      },
+      { kind: 'heading', text: 'Summary' },
+      {
+        kind: 'p',
+        text:
+          "A network never told anything about physics, trained only to compress and rebuild pendulum video, organizes its latent code so that DMD can correctly read the true motion back out (surviving a real shuffle-based significance test, not just eyeballing it), once given a small amount of delay rather than a single frame. That story holds regardless of the network's internal memory size, and a separate check (feeding the encoder two consecutive frames instead of stacking delay) confirmed the same q≥2 requirement and converged to the correct frequency slightly faster once real structure appeared. It breaks down cleanly, not ambiguously, once the swing amplitude is large enough that the pendulum's true physics stops being linear: the one finding in the project that more patience doesn't fix, and one that survived the same rigor as everything else.",
       },
     ],
   },
   {
     id: 'rnn',
-    index: '03',
+    index: '04',
     title: 'Sentence Generation with a Word-Level Vanilla RNN',
     subtitle: 'A word-level RNN trained on WikiText-103, extending character-level name prediction',
     year: '2025',
@@ -155,7 +287,7 @@ export const projects: Project[] = [
   },
   {
     id: 'paper-trading',
-    index: '04',
+    index: '05',
     title: 'Full-Stack Paper Trading Website',
     subtitle: 'Real-time intraday data, authentication, and portfolio tracking',
     year: '2024',
@@ -167,7 +299,7 @@ export const projects: Project[] = [
   },
   {
     id: 'neural-net',
-    index: '05',
+    index: '06',
     title: 'Simple Neural Network for Classifying Pattern-Based Vectors',
     subtitle: 'A from-scratch neural network exploring pattern recognition and gradient-based learning',
     year: '2024',
@@ -179,7 +311,7 @@ export const projects: Project[] = [
   },
   {
     id: 'genai',
-    index: '06',
+    index: '07',
     title: 'Generative AI and Synthetic Media',
     subtitle: 'A technical history presentation, from backpropagation to transformers',
     year: '2025',

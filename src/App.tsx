@@ -162,7 +162,7 @@ function Intro() {
           className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-3 animate-fade-up"
           style={{ animationDelay: '0.15s' }}
         >
-          <Stat k="6" label="projects" />
+          <Stat k="7" label="projects" />
           <Stat k="2027" label="expected graduation" />
         </div>
       </div>
