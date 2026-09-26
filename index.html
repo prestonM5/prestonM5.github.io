@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Technical research and Software Development work by Preston."
+    />
+    <title>Preston - Research Portfolio</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to work</a>
+
+    <header class="site-header">
+      <div class="site-header__avatar">
+        <img
+          src="assets/profile.jpg"
+          alt="Portrait of Preston Moore"
+          width="112"
+          height="112"
+        />
+      </div>
+      <div class="site-header__text">
+        <h1>Preston Moore</h1>
+        <p>Currently a senior @ UNC Charlotte for Computer Science and a Minor in Mathematics.</p>
+        <p class="site-links">
+          <a href="mailto:pmoore1637@gmail.com">Email</a>
+          <span aria-hidden="true">/</span>
+          <a href="https://github.com/prestonM5">GitHub</a>
+          <span aria-hidden="true">/</span>
+          <a href="https://www.linkedin.com/in/preston-moore-593870388/">LinkedIn</a>
+          <span aria-hidden="true">/</span>
+          <a href="#profile">About</a>
+        </p>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section id="work" aria-labelledby="work-title">
+        <h2 id="work-title">Selected work</h2>
+        <p>Projects/Independent Research</p>
+
+        <div class="project-list">
+          <article class="project" aria-labelledby="project-one-title">
+            <figure class="project__media">
+              <img
+                class="project__image"
+                src="assets/trading-suite/dashboard.png"
+              />
+            </figure>
+            <div class="project__body">
+              <h3 id="project-one-title">
+                <a
+                  href="https://suitetrading.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Trading Suite
+                </a>
+              </h3>
+              <p class="project__meta">Web Application · 2026</p>
+              <p class="project__premise">
+                A more intuitive alternative to traditional trading terminals. 
+                Built around the user, allowing them to create and customize dashboards to their liking.
+              </p>
+            </div>
+          </article>
+
+          <article class="project" aria-labelledby="project-two-title">
+            <figure class="project__media">
+              <img
+                class="project__image"
+                src="assets/gru/embeddings-pca.png"
+              />
+            </figure>
+            <div class="project__body">
+              <h3 id="project-two-title">
+                <a href="projects/gru-climate-embedding/">
+                  Recurrence Quantification Analysis of a GRU Autoencoder's
+                  Learned Climate Embedding
+                </a>
+              </h3>
+              <p class="project__meta">Independent experiment · 2026</p>
+              <p class="project__premise">
+                A GRU autoencoder's climate embedding, tested for seasonal
+                structure with joint recurrence plots and surrogate
+                significance testing.
+              </p>
+            </div>
+          </article>
+
+          <article class="project" aria-labelledby="project-three-title">
+            <figure class="project__media">
+              <img
+                class="project__image"
+                src="assets/koopman/frequency-convergence-q8.png"
+              />
+            </figure>
+            <div class="project__body">
+              <h3 id="project-three-title">
+                <a href="projects/koopman-pendulum/">
+                  Koopman Structure in a Reconstruction-Trained Embedding
+                </a>
+              </h3>
+              <p class="project__meta">Independent experiment · 2026</p>
+              <p class="project__premise">
+                A post-hoc Dynamic Mode Decomposition study investigating whether 
+                a convolutional autoencoder trained for simulated pendulum frame
+                reconstruction learns latent representations whose 
+                dynamics are predictable by a linear model.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="profile" aria-labelledby="profile-title">
+        <h2 id="profile-title">About</h2>
+        <p>
+          I love Deep Learning, Finance, Mathematics, Software, and doing independent research. My hobbies include making music, drawing, and playing League of Legends. 
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        <a href="mailto:pmoore1637@gmail.com">pmoore1637@gmail.com</a>
+        <span aria-hidden="true">/</span>
+        Charlotte 
+      </p>
+    </footer>
+  </body>
+</html>

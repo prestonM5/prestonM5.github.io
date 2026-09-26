@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A post-hoc Dynamic Mode Decomposition analysis of whether a convolutional autoencoder learns latent representations whose dynamics are predictable by a linear model."
+    />
+    <title>
+      Koopman Structure in a Reconstruction-Trained Embedding — Preston Moore
+    </title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+  </head>
+  <body class="record-page">
+    <a class="skip-link" href="#main-content">Skip to project</a>
+
+    <header class="record-header">
+      <nav class="record-nav" aria-label="Project navigation">
+        <a href="../../">← Selected work</a>
+      </nav>
+      <h1>Koopman Structure in a Reconstruction-Trained Embedding</h1>
+      <p class="record-deck">
+        A post-hoc Dynamic Mode Decomposition analysis of whether a
+        convolutional autoencoder learns latent representations whose
+        dynamics are predictable by a linear model.
+      </p>
+      <p class="record-question">
+        A convolutional autoencoder is trained, five times independently, to
+        compress 64×64 video frames of a simulated pendulum into an
+        8-dimensional latent code and reconstruct them, with no physical
+        parameters, velocity, or timing information. Dynamic Mode
+        Decomposition is then used to test whether the latent trajectory
+        evolves approximately linearly. Significant temporal structure
+        appears in every seed at the expected minimum delay (q = 2), but only
+        1 of 5 recovers the true oscillation frequency there, a mismatch that
+        larger delay resolves for all 5, unless the pendulum's swing is at a
+        larger amplitude (0.5 rad), where it does not.
+      </p>
+      <p class="record-meta">
+        Independent experiment · 2026 · PyTorch, pydmd, NumPy, SciPy,
+        Matplotlib
+      </p>
+    </header>
+
+    <main id="main-content" class="record-main">
+      <section class="record-section" id="method" aria-labelledby="method-title">
+        <h2 id="method-title">Method</h2>
+        <p>
+          A convolutional autoencoder (five independently trained seeds)
+          compresses each 64×64 frame of a rendered, numerically simulated
+          pendulum down to an 8-dimensional latent code and reconstructs the
+          frame from it, trained only on a pixel-wise reconstruction loss
+          (MSE). It is never given physical parameters, velocity, or timing
+          information. Dynamic Mode Decomposition (DMD) is then run on the resulting
+          latent trajectories to ask a separate question: in latent
+          coordinates, does the pendulum's motion become
+          <strong>linearly predictable</strong>, one frame's code mapping to
+          the next by a single fixed matrix? This is the Koopman-operator
+          idea: Koopman theory describes nonlinear dynamics through a linear
+          operator acting on observables (functions of the state). If a finite
+          set of observables is approximately closed under the dynamics, then
+          that set evolves approximately linearly, and the question is whether
+          latent coordinates learned only for reconstruction form such a set.
+          The DMD implementation was first validated against a published
+          fluid-dynamics benchmark (cylinder-wake flow, Re=100) to ≥6
+          significant figures before being applied to the pendulum.
+        </p>
+        <p>
+          A single frame does not determine the direction of motion (each
+          angle is passed once moving left and once moving right), so DMD is
+          run not on individual latent codes but on short stacks of
+          <strong>q</strong> consecutive codes (a delay embedding), so each
+          embedded point also carries angular-velocity information. How large
+          q needs to be before the trajectory becomes linearly predictable,
+          and separately, before DMD recovers the <em>correct</em> frequency,
+          are the project's two central questions.
+        </p>
+        <figure class="record-figure record-figure--xwide">
+          <img
+            src="../../assets/koopman/latent-trajectory-phase.png"
+            width="3800"
+            height="800"
+            loading="lazy"
+          />
+          <figcaption>
+            Latent trajectories retrace an angle-ordered arc, not a loop
+            (top-2 PCs, all 5 seeds) ·
+            <a href="../../assets/koopman/latent-trajectory-phase.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="record-section" id="results" aria-labelledby="results-title">
+        <h2 id="results-title">Results</h2>
+        <p>
+          All 5 seeds first cleared the one-step predictability threshold
+          (variance accounted for, VAF ≥ 0.90) at <strong>q* = 2</strong>, the
+          smallest delay at which one-step prediction is possible, since each
+          code depends only on the angle while the state (angle, angular
+          velocity) is 2-D, and saturated to VAF > 0.999 by q = 3. At q = 1
+          the VAF also exceeds 0.90 (0.971–0.984, left edge of the figure),
+          but it is no higher than a persistence baseline that predicts each
+          code to equal the previous one (difference ≤ 0.0003), so the q = 1
+          value reflects frame-to-frame similarity, not dynamics.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/vaf-vs-delay.png"
+            width="1400"
+            height="1000"
+            loading="lazy"
+          />
+          <figcaption>
+            Latent VAF vs. delay count, against the pixel-DMD baseline ·
+            <a href="../../assets/koopman/vaf-vs-delay.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          High one-step VAF alone is not evidence of dynamical structure: a
+          slow, smooth video can look predictable purely because consecutive
+          frames resemble each other. Each latent trajectory was tested
+          against 200 randomly shuffled versions of itself. Every seed's
+          observed VAF exceeded all 200 surrogates (p = 1/201, the minimum
+          attainable with 200 permutations; Holm-Bonferroni corrected
+          p = 0.0249 for all five), indicating that prediction accuracy
+          depends on the original temporal ordering and not merely on
+          frame-wise statistics.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/surrogate-null-vaf.png"
+            width="1600"
+            height="1000"
+            loading="lazy"
+          />
+          <figcaption>
+            Observed VAF sits far outside the surrogate null (5 seeds, q* = 2) ·
+            <a href="../../assets/koopman/surrogate-null-vaf.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <figure class="record-figure record-figure--xwide">
+          <img
+            src="../../assets/koopman/eigenvalue-significance-q2.png"
+            width="3800"
+            height="840"
+            loading="lazy"
+          />
+          <figcaption>
+            Observed eigenvalues sit near the unit circle, far from the
+            surrogate null. The title's 2/5 counts BOP-DMD estimates (seeds 1
+            and 4); by the exact-DMD markers shown, seeds 1, 2 and 4 sit near
+            f₀'s angle, and only seed 4 is within 1% ·
+            <a href="../../assets/koopman/eigenvalue-significance-q2.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          By the project's pre-specified test (exact DMD; Tu et al., 2014),
+          <strong>only 1 of 5 seeds</strong> recovered the pendulum's
+          oscillation frequency (f₀ = √(g/L)/2π = 0.498488 Hz, the
+          small-angle value; the exact frequency at 0.1 rad is 0.06% lower)
+          within the pre-specified 1% tolerance at q* = 2; the other four
+          passed the shuffle test, but their dominant DMD mode (largest
+          amplitude) was either at the harmonic 2f₀ (seeds 0 and 3),
+          or near f₀ but outside tolerance (seeds 1 and 2, 2.57% and 3.99%
+          off). A second estimator (BOP-DMD, plotted below) agrees on seeds 0
+          and 3 (harmonic) and seeds 1 and 4 (fundamental), places seed 2 at
+          the harmonic, and estimates the fundamental more accurately: seed 1
+          lands at 0.06% off f₀ under BOP-DMD versus 2.57% off (outside the
+          1% tolerance) under exact DMD, a known bias of exact DMD that
+          optimized DMD reduces (Askham &amp; Kutz, 2018; BOP-DMD: Sashidhar
+          &amp; Kutz, 2022). That accuracy difference, not a contradiction, is
+          why the figure below reads 2 of 5.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/frequency-mismatch-q2.png"
+            width="1800"
+            height="1000"
+            loading="lazy"
+          />
+          <figcaption>
+            BOP-DMD frequency matches f₀ for 2/5 seeds; the rest land at 2f₀ ·
+            <a href="../../assets/koopman/frequency-mismatch-q2.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="record-section" id="delay-extension" aria-labelledby="delay-extension-title">
+        <h2 id="delay-extension-title">Extension: a little more delay fixes it</h2>
+        <p>
+          Increasing the DMD delay q (same trained weights) resolved the
+          mismatch. By q = 5, all 5 seeds' dominant-mode frequency fell inside
+          the tolerance band; by q = 8, all 5 converged to within 0.06% of f₀
+          and stayed there through q = 21.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/frequency-vs-delay-sweep.png"
+            width="1600"
+            height="1100"
+            loading="lazy"
+          />
+          <figcaption>
+            All 5 seeds converge to f₀ by q = 8, unlike at the minimal q* = 2 ·
+            <a href="../../assets/koopman/frequency-vs-delay-sweep.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          With the complete test (shuffle test, Holm-Bonferroni correction,
+          and BOP-DMD confidence intervals) re-run at q = 8, all 5 seeds land
+          in the pre-specified success outcome (significant VAF and
+          dominant frequency within 1% of f₀), vs. 1 of 5 at q = 2.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/frequency-convergence-q8.png"
+            width="1800"
+            height="1000"
+            loading="lazy"
+          />
+          <figcaption>
+            At q = 8, BOP-DMD frequency matches f₀ for 5/5 seeds ·
+            <a href="../../assets/koopman/frequency-convergence-q8.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="record-section" id="capacity-extension" aria-labelledby="capacity-extension-title">
+        <h2 id="capacity-extension-title">Extension: does network size matter?</h2>
+        <p>
+          The same pattern held across a 16× range of latent dimension (d = 2
+          to d = 32, five independently trained seeds at each size). The
+          minimum delay for one-step predictability, q*, was 2 for all 25
+          (d, seed) combinations, consistent with q* being set by the state
+          dimension rather than by d. The delay needed to resolve the
+          <em>correct</em> frequency did vary: 24 of 25 combinations converged
+          by q = 8, with one exception (d = 4, seed 3), which converged at
+          q = 13 and passed the same tests there.
+        </p>
+        <figure class="record-figure record-figure--wide">
+          <img
+            src="../../assets/koopman/frequency-vs-delay-by-dimension.png"
+            width="2640"
+            height="1440"
+            loading="lazy"
+          />
+          <figcaption>
+            Frequency convergence across latent dimension d = 2, 4, 8, 16,
+            32: 24/25 (d, seed) pairs within tolerance by q = 8 ·
+            <a href="../../assets/koopman/frequency-vs-delay-by-dimension.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="record-section" id="nonlinear-extension" aria-labelledby="nonlinear-extension-title">
+        <h2 id="nonlinear-extension-title">Extension: pushing into the nonlinear regime</h2>
+        <p>
+          Every result above used a small, 0.1 rad (≈5.7°) amplitude, where a
+          pendulum is well approximated by the small-angle (harmonic
+          oscillator) model. Repeating everything at a larger amplitude,
+          0.5 rad (≈28.6°), where the small-angle frequency is off by 1.6%,
+          the pattern did not hold: no seed's dominant frequency came within
+          1% of the exact frequency at this amplitude (f₀ = 0.49071 Hz) at any
+          q ≤ 21. In every seed the dominant mode settled on a harmonic (2f₀
+          in four seeds, 3f₀ in one) and stayed there through q = 21.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/frequency-vs-delay-nonlinear.png"
+            width="1900"
+            height="1100"
+            loading="lazy"
+          />
+          <figcaption>
+            At 0.5 rad, the dominant frequency stays on a harmonic, never the
+            exact f₀ ·
+            <a href="../../assets/koopman/frequency-vs-delay-nonlinear.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          A supplementary check ruled out the pendulum's motion itself as the
+          cause: DMD run directly on the bob's exact (x, y) pixel coordinates
+          (no autoencoder involved) recovers the exact frequency to a relative
+          error of 6 × 10⁻¹¹ by q = 21. The harmonic dominance therefore
+          appears only after the motion is rendered and encoded (DMD was not
+          run on the rendered frames alone at this amplitude, so these two
+          steps are not separated). Applying the full shuffle test to these
+          runs confirmed that their predictability was not attributable to
+          noise. These runs also reached p = 1/201, indicating that the
+          frequency failure is not due to a lack of temporal structure.
+        </p>
+        <figure class="record-figure">
+          <img
+            src="../../assets/koopman/nonlinear-frequency-q13.png"
+            width="1800"
+            height="1000"
+            loading="lazy"
+          />
+          <figcaption>
+            At 0.5 rad and q = 13, BOP-DMD frequency matches the exact f₀ for
+            0/5 seeds ·
+            <a href="../../assets/koopman/nonlinear-frequency-q13.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="record-section" id="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Summary</h2>
+        <p>
+          An autoencoder trained only on per-frame reconstruction produces
+          latent codes from which DMD, with delay embedding, recovers the
+          pendulum's oscillation frequency once given q = 5–8 (13 in one case)
+          rather than a single frame. That story holds across the network's
+          latent dimension (d = 2–32), and a separate check (feeding the
+          encoder two consecutive frames instead of stacking delay) confirmed
+          the same q ≥ 2 requirement and converged to the correct frequency at
+          smaller q (3–5 rather than 5–8; this difference was not tested for
+          significance). It does not hold at the larger tested amplitude
+          (0.5 rad): the one finding in the project that increasing q (to 21)
+          did not change, and that passed the same significance test.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer record-footer">
+      <p><a href="../../">← Selected work</a></p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A GRU autoencoder's climate embedding, tested for seasonal structure with joint recurrence plots and surrogate significance testing."
+    />
+    <title>
+      Recurrence Quantification Analysis of a GRU Autoencoder's Learned
+      Climate Embedding — Preston Moore
+    </title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+  </head>
+  <body class="record-page">
+    <a class="skip-link" href="#main-content">Skip to project</a>
+
+    <header class="record-header">
+      <nav class="record-nav" aria-label="Project navigation">
+        <a href="../../">← Selected work</a>
+      </nav>
+      <h1>
+        Recurrence Quantification Analysis of a GRU Autoencoder's Learned
+        Climate Embedding
+      </h1>
+      <p class="record-deck">
+        A GRU autoencoder's climate embedding, tested for seasonal structure
+        with joint recurrence plots and surrogate significance testing.
+      </p>
+      <p class="record-question">
+        A GRU autoencoder compresses 14-day windows of Delhi daily climate
+        data (temperature, humidity, wind speed, pressure, and a cyclically
+        encoded date) into a 32-dimensional embedding per day. The question
+        is not whether it reconstructs well, but whether the embedding
+        encodes the seasonal cycle rather than an arbitrary compression of
+        the inputs. Recurrence plots and joint recurrence provide the
+        analysis, Takens' delay-embedding theorem motivates one experiment,
+        and surrogate testing with Bonferroni correction assesses
+        significance. Result: joint recurrence between the embedding and the
+        raw inputs is significant for humidity, wind speed, and date, but
+        not for pressure and temperature, despite their higher JRR/chance
+        ratios.
+      </p>
+      <p class="record-meta">
+        Independent experiment · 2026 · PyTorch, Matplotlib, Pandas,
+        Kagglehub
+      </p>
+    </header>
+
+    <main id="main-content" class="record-main">
+      <figure class="record-figure record-figure--opening">
+        <img
+          src="../../assets/gru/embeddings-pca.png"
+          width="1050"
+          height="900"
+          loading="lazy"
+        />
+        <figcaption>
+          The embeddings trace an annual loop in the first two principal
+          components (~58% combined variance), with the months in order ·
+          <a href="../../assets/gru/embeddings-pca.png">Open full resolution</a>
+        </figcaption>
+      </figure>
+
+      <section class="record-section" id="method" aria-labelledby="method-title">
+        <h2 id="method-title">Method</h2>
+        <p>
+          <strong>Data and model.</strong> Four climate variables plus a
+          sin/cos encoding of day-of-year (so Dec 31 and Jan 1 sit next to
+          each other) form a 14-day rolling window. A GRU encoder compresses
+          each window to a 32-dimensional hidden state; a GRU decoder
+          reconstructs all 14 days from that state alone. Windows are
+          stride-1 and chronological, so the day-by-day embeddings form a
+          trajectory through 32-dimensional space (~1449 points).
+        </p>
+        <figure class="record-figure record-figure--wide">
+          <img
+            src="../../assets/gru/features-over-time.png"
+            width="1500"
+            height="1200"
+            loading="lazy"
+          />
+          <figcaption>
+            Raw daily climate series, 2013–2017, train/test split ·
+            <a href="../../assets/gru/features-over-time.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <figure class="record-figure">
+          <img
+            src="../../assets/gru/date-encoding-circle.png"
+            width="900"
+            height="900"
+            loading="lazy"
+          />
+          <figcaption>
+            Cyclical day-of-year encoding, colored by month ·
+            <a href="../../assets/gru/date-encoding-circle.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          <strong>Why recurrence.</strong> Recurrence plots (Eckmann et al.,
+          1987) were used instead of Lyapunov exponents or full attractor
+          reconstruction because they work on short, noisy real-world data
+          without choosing an embedding dimension or delay; they need only
+          pairwise distances and a recurrence threshold (set here so the
+          embedding's recurrence rate is 5%).
+        </p>
+        <ul>
+          <li>
+            <strong>Recurrence plot</strong>: shows whether a trajectory
+            revisits earlier states in a structured way (for example,
+            periodically) or randomly.
+          </li>
+          <li>
+            <strong>Joint recurrence plot</strong>: checks whether two
+            trajectories, the embedding and a raw variable, revisit similar
+            states at the same time, which is consistent with a shared
+            driver (such as the seasonal cycle). The statistic reported is
+            <strong>JRR/chance</strong>, the joint recurrence rate divided
+            by the rate expected under independence.
+          </li>
+          <li>
+            <strong>Takens' theorem</strong>: motivates one experiment. A
+            delayed view of the observed signals alone can, in principle,
+            reconstruct a hidden driver like "season." So the model was
+            retrained with date removed, to check whether seasonal
+            structure survives.
+          </li>
+        </ul>
+        <p><strong>Statistical controls.</strong></p>
+        <ul>
+          <li>
+            <strong>Theiler window (14 days)</strong>: windows less than 14
+            days apart share raw input days and would look recurrent from
+            overlap alone, so such pairs are excluded from every recurrence
+            count.
+          </li>
+          <li>
+            <strong>Circular time-shift surrogates (n=200)</strong>: each
+            variable is time-shifted 200 ways to build a null distribution,
+            giving a p-value and z-score. Shifts near one year are excluded,
+            since they would reproduce the true seasonal alignment instead
+            of a null case.
+          </li>
+          <li>
+            <strong>Bonferroni correction</strong>: five variables tested,
+            so α = 0.05/5 = 0.01.
+          </li>
+        </ul>
+      </section>
+
+      <section class="record-section" id="results" aria-labelledby="results-title">
+        <h2 id="results-title">Results</h2>
+        <p>
+          <strong>1. PCA.</strong> The embeddings trace an annual loop in the
+          first two principal components (~58% combined variance), with the
+          months in order around it (pictured above). This is suggestive,
+          not conclusive.
+        </p>
+        <p>
+          <strong>2. Joint recurrence.</strong> JRR/chance: date 7.25×,
+          pressure 2.71×, temperature 2.47×, humidity 1.69×, wind speed
+          1.38×. Read on its own, this suggests date dominates the
+          embedding's learned structure.
+        </p>
+        <figure class="record-figure record-figure--wide">
+          <img
+            src="../../assets/gru/cross-recurrence.png"
+            width="2250"
+            height="1500"
+            loading="lazy"
+          />
+          <figcaption>
+            Joint recurrence grid for all 5 variables, with surrogate
+            p-values ·
+            <a href="../../assets/gru/cross-recurrence.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          <strong>3. Date ablation.</strong> Retrained without date as an
+          input, the JRR/chance against true date drops from 7.25× to 4.91×
+          (lower, but still well above 1×), and the annual loop in the PCA
+          largely disappears. Seasonal information therefore remains in the
+          embedding without the date input. This is consistent with Takens'
+          theorem but does not require it: the climate variables,
+          temperature in particular, are seasonal on their own.
+        </p>
+        <figure class="record-figure record-figure--wide">
+          <img
+            src="../../assets/gru/date-ablation-pca.png"
+            width="2100"
+            height="900"
+            loading="lazy"
+          />
+          <figcaption>
+            PCA, with vs. without date input ·
+            <a href="../../assets/gru/date-ablation-pca.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <figure class="record-figure record-figure--wide">
+          <img
+            src="../../assets/gru/date-ablation-recurrence.png"
+            width="1800"
+            height="900"
+            loading="lazy"
+          />
+          <figcaption>
+            Joint recurrence vs. true date, with vs. without date input ·
+            <a href="../../assets/gru/date-ablation-recurrence.png">Open full resolution</a>
+          </figcaption>
+        </figure>
+        <p>
+          <strong>4. Surrogate testing.</strong> After Bonferroni
+          correction, only humidity (z=5.88), wind speed (z=5.69), and date
+          (z=2.15) stay significant (p = 0.00498 each, the minimum
+          attainable with 200 surrogates, against α = 0.01). Pressure and
+          temperature, despite larger raw ratios, do not survive (p = 0.0149
+          and 0.0299). Possible reasons: pressure's recurrence structure is
+          patchy and event-clustered (note the spikes in its raw series),
+          which inflates its null variance; temperature, like date, is
+          strongly periodic, and for a periodic variable many shifted copies
+          still partly phase-match, widening the null. The same effect would
+          explain date's low z-score.
+        </p>
+        <p>
+          Joint recurrence between the embedding and the raw inputs is
+          significant for 3 of 5 variables: humidity, wind speed, date.
+          Ratio size and statistical significance disagree here, and the
+          "date is the standout" reading does not hold: date remains
+          significant, but with the smallest z-score of the three.
+        </p>
+      </section>
+
+      <section class="record-section" id="robustness" aria-labelledby="robustness-title">
+        <h2 id="robustness-title">Robustness</h2>
+        <p>
+          An audit found the Theiler exclusion was one day wide instead of
+          14 days, inflating early numbers. Before fixing it, the window was
+          swept across five sizes (0, 1, 14, 30, 60 days): rankings and
+          rough magnitudes held at every size, only the exact values moved
+          (date 7.81× → 7.25×). Two more bugs (a leap-year phase error in
+          the date encoding, and an unseeded RNG) were fixed the same way,
+          and every result was regenerated and reproduced bit-for-bit.
+        </p>
+      </section>
+
+      <section class="record-section" id="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Summary</h2>
+        <p>
+          Recurrence plots, joint recurrence, and a Takens-motivated
+          ablation indicate that the embedding encodes the seasonal cycle.
+          Surrogate testing with Bonferroni correction overturns the naive
+          reading of the ratios: humidity, wind speed, and date hold up
+          statistically, while pressure and temperature, despite higher
+          ratios, do not.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer record-footer">
+      <p><a href="../../">← Selected work</a></p>
+    </footer>
+  </body>
+</html>
